@@ -2,20 +2,24 @@ package com.exalt.bank_account_test.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Account {
+    private UUID id;
     // to simplify, we consider that we use only one currency here (euros for example)
-    private double amount;
+    private double balance;
     // list that will contain our transactions history
     private List<Transaction> transactions;
 
     public Account() {
-        this.amount = 0.0;
+        this.id = UUID.randomUUID();
+        this.balance = 0.0;
         this.transactions = new ArrayList<>();
     }
 
     public Account(double amount) {
-        this.amount = amount;
+        this.id = UUID.randomUUID();
+        this.balance = amount;
         this.transactions = new ArrayList<>();
     }
 
@@ -30,7 +34,7 @@ public class Account {
             return false;
         }
         
-        this.amount += transaction.getAmount();
+        this.balance += transaction.getAmount();
         this.transactions.add(transaction);
         return true;
     }
@@ -46,17 +50,21 @@ public class Account {
             return false;
         }
 
-        this.amount -= transaction.getAmount();
+        this.balance -= transaction.getAmount();
         this.transactions.add(transaction);
         return true;
+    }
+
+    public UUID getId() {
+        return id;
     }
 
     /**
      * getter to be able to consult the balance
      * @return the amount of money in euros
      */
-    public double getAmount() {
-        return amount;
+    public double getBalance() {
+        return balance;
     }
 
     /**
@@ -79,6 +87,6 @@ public class Account {
 
     @Override
     public String toString() {
-        return "Account [amount=" + amount + ", transactions=" + transactions + "]";
+        return "Account [balance=" + balance + ", transactions=" + transactions + "]";
     }
 }
