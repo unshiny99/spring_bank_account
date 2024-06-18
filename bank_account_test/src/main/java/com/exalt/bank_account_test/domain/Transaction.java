@@ -5,6 +5,7 @@ import java.util.Date;
 
 public class Transaction {
     private double amount;
+    // we consider that sometimes operations are not made directly, so we store the transaction "request" date
     private Date date;
 
     public Transaction(double amount) {
@@ -21,16 +22,8 @@ public class Transaction {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
     public Date getDate() {
         return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     @Override

@@ -19,20 +19,62 @@ public class Account {
         this.transactions = new ArrayList<>();
     }
 
+    /**
+     * to deposit money in the account
+     * @param transaction amount and date
+     * @return boolean indicating the success state
+     */
+    public boolean depositMoney(Transaction transaction) {
+        // check that we pass a strictly positive value in the transaction object in that case
+        if(transaction.getAmount() < 0) {
+            return false;
+        }
+        
+        this.amount += transaction.getAmount();
+        this.transactions.add(transaction);
+        return true;
+    }
+
+    /**
+     * to withdraw money in the account
+     * @param transaction amount and date
+     * @return boolean indicating the success state
+     */
+    public boolean withdrawMoney(Transaction transaction) {
+        // check that we pass a strictly positive value in the transaction object in that case
+        if(transaction.getAmount() < 0) {
+            return false;
+        }
+
+        this.amount -= transaction.getAmount();
+        this.transactions.add(transaction);
+        return true;
+    }
+
+    /**
+     * getter to be able to consult the balance
+     * @return the amount of money in euros
+     */
     public double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
-
+    /**
+     * getter to retrieve the transaction history
+     * @return the list of transactions
+     */
     public List<Transaction> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
+    /**
+     * method to display the transaction history
+     */
+    public void consultTransactionHistory() {
+        System.out.println("Historique des transactions :");
+        for(Transaction transaction : transactions) {
+            System.out.println(transaction.toString());
+        }
     }
 
     @Override
