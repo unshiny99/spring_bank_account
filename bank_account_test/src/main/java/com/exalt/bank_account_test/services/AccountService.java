@@ -5,7 +5,7 @@ import java.util.UUID;
 import com.exalt.bank_account_test.domain.Transaction;
 
 public interface AccountService {
-    void createAccount();
+    UUID createAccount();
     void consultBalance(UUID id);
     void consultTransactionHistory(UUID id);
     boolean depositMoney(UUID id, Transaction transaction);

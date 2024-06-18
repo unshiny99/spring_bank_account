@@ -14,9 +14,11 @@ public class DomainAccountService implements AccountService {
     }
 
     @Override
-    public void createAccount() {
+    public UUID createAccount() {
         Account account = new Account();
         accountRepository.save(account);
+
+        return account.getId();
     }
 
     @Override
