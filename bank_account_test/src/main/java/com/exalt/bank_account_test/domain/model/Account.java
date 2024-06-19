@@ -1,4 +1,4 @@
-package com.exalt.bank_account_test.domain;
+package com.exalt.bank_account_test.domain.model;
 
 import java.util.ArrayList;
 import java.util.List;

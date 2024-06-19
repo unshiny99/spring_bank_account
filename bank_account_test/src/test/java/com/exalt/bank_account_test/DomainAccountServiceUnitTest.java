@@ -1,6 +1,5 @@
 package com.exalt.bank_account_test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,10 +16,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.exalt.bank_account_test.domain.Account;
-import com.exalt.bank_account_test.domain.Transaction;
-import com.exalt.bank_account_test.repositories.AccountRepository;
-import com.exalt.bank_account_test.services.DomainAccountService;
+import com.exalt.bank_account_test.adapters.repository.AccountRepository;
+import com.exalt.bank_account_test.domain.model.Account;
+import com.exalt.bank_account_test.domain.model.Transaction;
+import com.exalt.bank_account_test.domain.service.DomainAccountService;
 
 public class DomainAccountServiceUnitTest {
     private AccountRepository accountRepository;
@@ -62,7 +61,7 @@ public class DomainAccountServiceUnitTest {
 
         accountServiceUnitTest.consultTransactionHistory(accountId);
 
-        verify(account, times(1)).consultTransactionHistory();
+        verify(account, times(1)).getTransactions();
     }
 
     @Test

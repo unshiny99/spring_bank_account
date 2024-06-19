@@ -1,10 +1,11 @@
-package com.exalt.bank_account_test.services;
+package com.exalt.bank_account_test.domain.service;
 
+import java.util.List;
 import java.util.UUID;
 
-import com.exalt.bank_account_test.domain.Account;
-import com.exalt.bank_account_test.domain.Transaction;
-import com.exalt.bank_account_test.repositories.AccountRepository;
+import com.exalt.bank_account_test.adapters.repository.AccountRepository;
+import com.exalt.bank_account_test.domain.model.Account;
+import com.exalt.bank_account_test.domain.model.Transaction;
 
 public class DomainAccountService implements AccountService {
     private final AccountRepository accountRepository;
@@ -22,16 +23,19 @@ public class DomainAccountService implements AccountService {
     }
 
     @Override
-    public void consultBalance(UUID id) {
+    public String consultBalance(UUID id) {
         Account account = getAccount(id);
         double balance = account.getBalance();
         System.out.println("Solde : " + balance);
+
+        return String.valueOf(balance) + " €";
     }
 
     @Override
-    public void consultTransactionHistory(UUID id) {
+    public List<Transaction> consultTransactionHistory(UUID id) {
         Account account = getAccount(id);
-        account.consultTransactionHistory();
+
+        return account.getTransactions();
     }
 
     @Override
