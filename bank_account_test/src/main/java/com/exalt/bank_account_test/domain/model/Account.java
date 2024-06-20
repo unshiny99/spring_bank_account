@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
+
 public class Account {
     private UUID id;
     // to simplify, we consider that we use only one currency here (euros for example)
@@ -45,18 +47,22 @@ public class Account {
      * @return boolean indicating the success state
      */
     public boolean withdrawMoney(Transaction transaction) {
-        // check that we pass a strictly positive value in the transaction object in that case
-        if(transaction.getAmount() < 0) {
+        // check that we pass a strictly negative value in the transaction object in that case
+        if(transaction.getAmount() > 0) {
             return false;
         }
 
-        this.balance -= transaction.getAmount();
+        this.balance += transaction.getAmount();
         this.transactions.add(transaction);
         return true;
     }
 
     public UUID getId() {
         return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     /**
@@ -67,12 +73,20 @@ public class Account {
         return balance;
     }
 
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+
     /**
      * getter to retrieve the transaction history
      * @return the list of transactions
      */
     public List<Transaction> getTransactions() {
         return transactions;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
     }
 
     /**
@@ -83,6 +97,15 @@ public class Account {
         for(Transaction transaction : transactions) {
             System.out.println(transaction.toString());
         }
+    }
+
+    // convert entity to domain model
+    public AccountEntity toEntity() {
+        AccountEntity account = new AccountEntity();
+        account.setId(this.id);
+        account.setBalance(this.balance);
+        account.setTransactions(transactions);
+        return account;
     }
 
     @Override

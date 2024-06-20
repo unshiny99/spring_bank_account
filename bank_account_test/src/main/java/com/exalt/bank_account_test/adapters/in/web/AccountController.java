@@ -1,4 +1,4 @@
-package com.exalt.bank_account_test.controllers;
+package com.exalt.bank_account_test.adapters.in.web;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,9 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.exalt.bank_account_test.domain.model.Account;
 import com.exalt.bank_account_test.domain.model.Transaction;
 import com.exalt.bank_account_test.domain.service.AccountService;
+import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,29 +19,37 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
-
-
 @RestController
 @RequestMapping("/accounts")
 public class AccountController {
+    @Autowired
     private AccountService accountService;
 
-    //@Autowired
     public AccountController(AccountService accountService) {
         this.accountService = accountService;
     }
 
     @PostMapping
-    public ResponseEntity<String> createAccount(@RequestBody Account account) {
+    public ResponseEntity<String> createAccount(@RequestBody AccountEntity account) {
         try {
-            UUID id = accountService.createAccount();
+            UUID id = accountService.createAccount(account);
             String message = String.format("Account well created : %s", id);
             return new ResponseEntity<>(message, HttpStatus.CREATED);
         } catch(Exception exception) {
             return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping
+    public ResponseEntity<List<AccountEntity>> getAccounts() {
+        try {
+            List<AccountEntity> accounts = accountService.getAccounts();
+            return new ResponseEntity<>(accounts, HttpStatus.OK);
+        } catch(Exception exception) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
 
     @GetMapping("/{id}/balance")
     public ResponseEntity<String> getBalance(@PathVariable UUID id) {
@@ -71,7 +79,7 @@ public class AccountController {
     }
     
     
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/withdraw")
     public ResponseEntity<String> withdrawMoney(@PathVariable UUID id, @RequestBody Transaction transaction) {
         try {
             boolean result = accountService.withdrawMoney(id, transaction);
@@ -86,7 +94,7 @@ public class AccountController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id}/deposit")
     public ResponseEntity<String> depositMoney(@PathVariable UUID id, @RequestBody Transaction transaction) {
         try {
             boolean result = accountService.depositMoney(id, transaction);
