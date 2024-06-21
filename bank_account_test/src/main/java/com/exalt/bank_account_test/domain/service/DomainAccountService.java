@@ -21,7 +21,6 @@ public class DomainAccountService implements AccountService {
     @Override
     public UUID createAccount(AccountEntity accountEntity) {
         AccountEntity generatedEntity = accountRepository.save(accountEntity);
-        System.out.println(generatedEntity);
         return generatedEntity.getId();
     }
 
@@ -34,7 +33,6 @@ public class DomainAccountService implements AccountService {
     public String consultBalance(UUID id) {
         Account account = getAccount(id);
         double balance = account.getBalance();
-        System.out.println("Solde : " + balance);
 
         return String.valueOf(balance) + " €";
     }

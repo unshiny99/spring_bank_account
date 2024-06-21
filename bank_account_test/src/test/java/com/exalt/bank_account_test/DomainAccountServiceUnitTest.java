@@ -6,18 +6,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import com.exalt.bank_account_test.domain.model.Account;
 import com.exalt.bank_account_test.domain.model.Transaction;
 import com.exalt.bank_account_test.domain.ports.AccountRepository;
 import com.exalt.bank_account_test.domain.service.DomainAccountService;
@@ -78,57 +80,59 @@ public class DomainAccountServiceUnitTest {
         verify(accountRepository, times(1)).findById(accountId);
     }
 
-    @Test
-    void shouldDepositMoney_thenSaveIt() {
+    // Define a method that provides test arguments for deposit cases
+    static Stream<Arguments> provideDepositTestCases() {
+        return Stream.of(
+            Arguments.of(100.0, 50.0, 150.0, true),
+            Arguments.of(100.0, -50.0, 100.0, false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDepositTestCases")
+    void shouldDepositMoney_thenSaveIt(double initialBalance, double depositAmount, double expectedBalance, boolean expectedResult) {
+        // Arrange
         UUID accountId = UUID.randomUUID();
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setId(accountId);
-        accountEntity.setBalance(100.0);
-
-        Transaction depositTransaction = new Transaction(50.0);
-
+        accountEntity.setBalance(initialBalance);
+    
+        Transaction depositTransaction = new Transaction(depositAmount);
+    
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
         when(accountRepository.save(any(AccountEntity.class))).thenAnswer(invocation -> {
             AccountEntity updatedEntity = invocation.getArgument(0);
             accountEntity.setBalance(updatedEntity.getBalance());
             return updatedEntity;
         });
-
+    
+        // Act
         boolean result = accountServiceUnitTest.depositMoney(accountId, depositTransaction);
-
-        assertTrue(result);
-        assertEquals(150.0, accountEntity.getBalance());
-        verify(accountRepository, times(1)).save(any(AccountEntity.class));
+    
+        // Assert
+        assertEquals(expectedResult, result); // Check if the operation result matches the expected result
+        assertEquals(expectedBalance, accountEntity.getBalance()); // Verify balance after the operation
+        verify(accountRepository, times(expectedResult ? 1 : 0)).save(any(AccountEntity.class)); // Check if save was called based on the expected result
     }
 
-    @Test
-    void shouldNotDepositMoney_whenDepositFails() {
+    // Define a method that provides test arguments for withdrawal cases
+    static Stream<Arguments> provideWithdrawTestCases() {
+        return Stream.of(
+            Arguments.of(100.0, -50.0, 50.0, true),
+            Arguments.of(100.0, 50.0, 100.0, false) 
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideWithdrawTestCases")
+    void shouldWithdrawMoney_thenSaveIt(double initialBalance, double withdrawAmount, double expectedBalance, boolean expectedResult) {
         UUID accountId = UUID.randomUUID();
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setId(accountId);
-        accountEntity.setBalance(100.0);
-
-        Transaction depositTransaction = new Transaction(-50.0);
-
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
-
-        boolean result = accountServiceUnitTest.depositMoney(accountId, depositTransaction);
-
-        assertFalse(result);
-        assertEquals(100.0, accountEntity.getBalance());
-        verify(accountRepository, times(0)).save(any(AccountEntity.class));
-    }
-
-    @Test
-    void shouldWithdrawMoney_thenSaveIt() {
-        // Arrange
-        UUID accountId = UUID.randomUUID();
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setId(accountId);
-        accountEntity.setBalance(100.0);
-
-        Transaction withdrawTransaction = new Transaction(-50.0);
-
+        accountEntity.setBalance(initialBalance);
+    
+        Transaction withdrawTransaction = new Transaction(withdrawAmount);
+    
         when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
         when(accountRepository.save(any(AccountEntity.class))).thenAnswer(invocation -> {
             AccountEntity updatedEntity = invocation.getArgument(0);
@@ -138,31 +142,9 @@ public class DomainAccountServiceUnitTest {
 
         // Act
         boolean result = accountServiceUnitTest.withdrawMoney(accountId, withdrawTransaction);
-
-        // Assert
-        assertTrue(result);
-        assertEquals(50.0, accountEntity.getBalance());
-        verify(accountRepository, times(1)).save(any(AccountEntity.class));
-    }
-
-    @Test
-    void shouldNotWithdrawMoney_whenWithdrawFails() {
-        // Arrange
-        UUID accountId = UUID.randomUUID();
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setId(accountId);
-        accountEntity.setBalance(100.0);
-
-        // try to withdraw a positive value
-        Transaction withdrawTransaction = new Transaction(50.0);
-
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
-
-        boolean result = accountServiceUnitTest.withdrawMoney(accountId, withdrawTransaction);
-
-        // Assert
-        assertFalse(result);
-        assertEquals(100.0, accountEntity.getBalance());
-        verify(accountRepository, times(0)).save(any(AccountEntity.class));
+    
+        assertEquals(expectedResult, result); // Check if the operation result matches the expected result
+        assertEquals(expectedBalance, accountEntity.getBalance()); // Verify balance after the operation
+        verify(accountRepository, times(expectedResult ? 1 : 0)).save(any(AccountEntity.class)); // Check if save was called based on the expected result
     }
 }
