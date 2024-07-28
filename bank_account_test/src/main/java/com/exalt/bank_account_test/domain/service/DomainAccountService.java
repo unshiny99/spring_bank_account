@@ -30,11 +30,11 @@ public class DomainAccountService implements AccountService {
     }
 
     @Override
-    public String consultBalance(UUID id) {
+    public double consultBalance(UUID id) {
         Account account = getAccount(id);
         double balance = account.getBalance();
 
-        return String.valueOf(balance) + " €";
+        return balance;
     }
 
     @Override

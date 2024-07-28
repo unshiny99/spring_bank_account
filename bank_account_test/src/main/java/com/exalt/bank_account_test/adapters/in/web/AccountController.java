@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.exalt.bank_account_test.domain.model.Transaction;
@@ -54,12 +55,8 @@ public class AccountController {
     @GetMapping("/{id}/balance")
     public ResponseEntity<String> getBalance(@PathVariable UUID id) {
         try {
-            String balance = accountService.consultBalance(id);
-            if(balance.isEmpty()) {
-                return new ResponseEntity<>("An error occured while accessing your balance.", HttpStatus.BAD_REQUEST);
-            }
-
-            String message = "Balance : " + balance;
+            double balance = accountService.consultBalance(id);
+            String message = "Balance : " + balance + " €";
             return new ResponseEntity<>(message, HttpStatus.OK);
         } catch(Exception exception) {
             return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,33 +76,34 @@ public class AccountController {
     }
     
     
-    @PutMapping("/{id}/withdraw")
-    public ResponseEntity<String> withdrawMoney(@PathVariable UUID id, @RequestBody Transaction transaction) {
-        try {
-            boolean result = accountService.withdrawMoney(id, transaction);
-            if(! result) {
-                return new ResponseEntity<>("An error occured while withdrawing money. Please check the parameters.", HttpStatus.BAD_REQUEST);
+    @PostMapping("/{id}/transactions")
+    public ResponseEntity<String> withdrawMoney(@PathVariable UUID id, @RequestParam String operationType, @RequestBody Transaction transaction) {
+        if(operationType.equals("withdraw")) {
+            try {
+                boolean result = accountService.withdrawMoney(id, transaction);
+                if(! result) {
+                    return new ResponseEntity<>("An error occured while withdrawing money. Please check the parameters.", HttpStatus.BAD_REQUEST);
+                }
+    
+                String message = String.format("Money well withdrawed in %s", id);
+                return new ResponseEntity<>(message, HttpStatus.CREATED);
+            } catch(Exception exception) {
+                return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-            String message = String.format("Money well withdrawed in %s", id);
-            return new ResponseEntity<>(message, HttpStatus.CREATED);
-        } catch(Exception exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PutMapping("/{id}/deposit")
-    public ResponseEntity<String> depositMoney(@PathVariable UUID id, @RequestBody Transaction transaction) {
-        try {
-            boolean result = accountService.depositMoney(id, transaction);
-            if(! result) {
-                return new ResponseEntity<>("An error occured while depositing money. Please check the parameters.", HttpStatus.BAD_REQUEST);
+        } else if(operationType.equals("deposit")) {
+            try {
+                boolean result = accountService.depositMoney(id, transaction);
+                if(! result) {
+                    return new ResponseEntity<>("An error occured while depositing money. Please check the parameters.", HttpStatus.BAD_REQUEST);
+                }
+    
+                String message = String.format("Money well deposited in %s", id);
+                return new ResponseEntity<>(message, HttpStatus.CREATED);
+            } catch(Exception exception) {
+                return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-
-            String message = String.format("Money well deposited in %s", id);
-            return new ResponseEntity<>(message, HttpStatus.CREATED);
-        } catch(Exception exception) {
-            return new ResponseEntity<>(exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } else {
+            return new ResponseEntity<>("The operationType attribute is incorrect. Authorized values : deposit or withdraw.", HttpStatus.BAD_REQUEST);
         }
     }
 }

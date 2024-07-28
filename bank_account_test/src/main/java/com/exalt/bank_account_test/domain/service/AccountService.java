@@ -12,7 +12,7 @@ import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEn
 public interface AccountService {
     UUID createAccount(AccountEntity accountEntity);
     List<AccountEntity> getAccounts();
-    String consultBalance(UUID id);
+    double consultBalance(UUID id);
     List<Transaction> consultTransactionHistory(UUID id);
     boolean depositMoney(UUID id, Transaction transaction);
     boolean withdrawMoney(UUID id, Transaction transaction);
