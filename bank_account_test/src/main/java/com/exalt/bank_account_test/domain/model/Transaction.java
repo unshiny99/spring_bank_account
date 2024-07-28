@@ -1,7 +1,6 @@
 package com.exalt.bank_account_test.domain.model;
 
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Embeddable;
 
@@ -9,30 +8,36 @@ import jakarta.persistence.Embeddable;
 public class Transaction {
     private double amount;
     // we consider that sometimes operations are not made directly, so we store the transaction "request" date
-    private Date date;
+    private LocalDateTime dateTime;
 
-    protected Transaction() {}
+    protected Transaction() {
+        this.dateTime = LocalDateTime.now();
+    }
 
     public Transaction(double amount) {
         this.amount = amount;
-        this.date = Date.from(Instant.now());
+        this.dateTime = LocalDateTime.now();
     }
 
-    public Transaction(double amount, Date date) {
+    public Transaction(double amount, LocalDateTime dateTime) {
         this.amount = amount;
-        this.date = date;
+        if(dateTime != null) {
+            this.dateTime = dateTime;
+        } else {
+            this.dateTime = LocalDateTime.now();
+        }
     }
 
     public double getAmount() {
         return amount;
     }
 
-    public Date getDate() {
-        return date;
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 
     @Override
     public String toString() {
-        return "Transaction [amount=" + amount + ", date=" + date + "]";
+        return "Transaction [amount=" + amount + ", dateTime=" + dateTime + "]";
     }
 }
