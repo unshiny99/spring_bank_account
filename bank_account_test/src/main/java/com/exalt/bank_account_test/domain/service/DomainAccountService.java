@@ -5,28 +5,28 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import com.exalt.bank_account_test.adapters.out.persistence.AccountRepositoryAdapter;
 import com.exalt.bank_account_test.domain.model.Account;
 import com.exalt.bank_account_test.domain.model.Transaction;
-import com.exalt.bank_account_test.domain.ports.AccountRepository;
 import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
 
 @Service
 public class DomainAccountService implements AccountService {
-    private final AccountRepository accountRepository;
+    private final AccountRepositoryAdapter accountRepositoryAdapter;
 
-    public DomainAccountService(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    public DomainAccountService( AccountRepositoryAdapter accountRepositoryAdapter) {
+        this.accountRepositoryAdapter = accountRepositoryAdapter;
     }
 
     @Override
     public UUID createAccount(AccountEntity accountEntity) {
-        AccountEntity generatedEntity = accountRepository.save(accountEntity);
+        AccountEntity generatedEntity = accountRepositoryAdapter.saveAccount(accountEntity);
         return generatedEntity.getId();
     }
 
     @Override
     public List<AccountEntity> getAccounts() {
-        return accountRepository.findAll();
+        return accountRepositoryAdapter.findAll();
     }
 
     @Override
@@ -50,7 +50,7 @@ public class DomainAccountService implements AccountService {
         boolean result = account.depositMoney(transaction);
 
         if(result == true) {
-            accountRepository.save(account.toEntity());
+            accountRepositoryAdapter.saveAccount(account.toEntity());
         }
         return result;
     }
@@ -61,7 +61,7 @@ public class DomainAccountService implements AccountService {
         boolean result = account.withdrawMoney(transaction);
 
         if(result == true) {
-            accountRepository.save(account.toEntity());
+            accountRepositoryAdapter.saveAccount(account.toEntity());
         }
         return result;
     }
@@ -72,7 +72,7 @@ public class DomainAccountService implements AccountService {
      * @return Account or RuntimeException if not found
      */
      private Account getAccount(UUID id) {
-        return accountRepository
+        return accountRepositoryAdapter
           .findById(id)
           .map(AccountEntity::toDomain)
           .orElseThrow(() -> new RuntimeException("Account not found"));

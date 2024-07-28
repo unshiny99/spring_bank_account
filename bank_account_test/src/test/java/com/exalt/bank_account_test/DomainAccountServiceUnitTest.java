@@ -1,9 +1,7 @@
 package com.exalt.bank_account_test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -20,19 +18,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.exalt.bank_account_test.adapters.out.persistence.AccountRepositoryAdapter;
 import com.exalt.bank_account_test.domain.model.Transaction;
 import com.exalt.bank_account_test.domain.ports.AccountRepository;
 import com.exalt.bank_account_test.domain.service.DomainAccountService;
 import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
 
 public class DomainAccountServiceUnitTest {
-    private AccountRepository accountRepository;
+    private AccountRepositoryAdapter accountRepositoryAdapter;
     private DomainAccountService accountServiceUnitTest;
 
     @BeforeEach
     void setUp() {
-        accountRepository = mock(AccountRepository.class);
-        accountServiceUnitTest = new DomainAccountService(accountRepository);
+        accountRepositoryAdapter = mock(AccountRepositoryAdapter.class);
+        accountServiceUnitTest = new DomainAccountService(accountRepositoryAdapter);
     }
 
     @Test
@@ -42,13 +41,13 @@ public class DomainAccountServiceUnitTest {
          AccountEntity savedEntity = new AccountEntity();
          savedEntity.setId(UUID.randomUUID()); // Assume setId method exists
  
-         when(accountRepository.save(any(AccountEntity.class))).thenReturn(savedEntity);
+         when(accountRepositoryAdapter.saveAccount(any(AccountEntity.class))).thenReturn(savedEntity);
  
          // Call the method under test
          UUID resultId = accountServiceUnitTest.createAccount(accountEntity);
  
          assertNotNull(resultId);
-         verify(accountRepository, times(1)).save(any(AccountEntity.class));
+         verify(accountRepositoryAdapter, times(1)).saveAccount(any(AccountEntity.class));
     }
 
     @Test
@@ -58,11 +57,11 @@ public class DomainAccountServiceUnitTest {
         accountEntity.setId(accountId);
         accountEntity.setBalance(100.0);
 
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(accountEntity));
 
         accountServiceUnitTest.consultBalance(accountId);
 
-        verify(accountRepository, times(1)).findById(accountId);
+        verify(accountRepositoryAdapter, times(1)).findById(accountId);
         String balance = accountServiceUnitTest.consultBalance(accountId);
         assertEquals("100.0 €", balance);
     }
@@ -73,11 +72,11 @@ public class DomainAccountServiceUnitTest {
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setId(accountId);
 
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(accountEntity));
 
         accountServiceUnitTest.consultTransactionHistory(accountId);
 
-        verify(accountRepository, times(1)).findById(accountId);
+        verify(accountRepositoryAdapter, times(1)).findById(accountId);
     }
 
     // Define a method that provides test arguments for deposit cases
@@ -99,8 +98,8 @@ public class DomainAccountServiceUnitTest {
     
         Transaction depositTransaction = new Transaction(depositAmount);
     
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
-        when(accountRepository.save(any(AccountEntity.class))).thenAnswer(invocation -> {
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(accountEntity));
+        when(accountRepositoryAdapter.saveAccount(any(AccountEntity.class))).thenAnswer(invocation -> {
             AccountEntity updatedEntity = invocation.getArgument(0);
             accountEntity.setBalance(updatedEntity.getBalance());
             return updatedEntity;
@@ -112,7 +111,7 @@ public class DomainAccountServiceUnitTest {
         // Assert
         assertEquals(expectedResult, result); // Check if the operation result matches the expected result
         assertEquals(expectedBalance, accountEntity.getBalance()); // Verify balance after the operation
-        verify(accountRepository, times(expectedResult ? 1 : 0)).save(any(AccountEntity.class)); // Check if save was called based on the expected result
+        verify(accountRepositoryAdapter, times(expectedResult ? 1 : 0)).saveAccount(any(AccountEntity.class)); // Check if save was called based on the expected result
     }
 
     // Define a method that provides test arguments for withdrawal cases
@@ -133,8 +132,8 @@ public class DomainAccountServiceUnitTest {
     
         Transaction withdrawTransaction = new Transaction(withdrawAmount);
     
-        when(accountRepository.findById(accountId)).thenReturn(Optional.of(accountEntity));
-        when(accountRepository.save(any(AccountEntity.class))).thenAnswer(invocation -> {
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(accountEntity));
+        when(accountRepositoryAdapter.saveAccount(any(AccountEntity.class))).thenAnswer(invocation -> {
             AccountEntity updatedEntity = invocation.getArgument(0);
             accountEntity.setBalance(updatedEntity.getBalance());
             return updatedEntity;
@@ -145,6 +144,6 @@ public class DomainAccountServiceUnitTest {
     
         assertEquals(expectedResult, result); // Check if the operation result matches the expected result
         assertEquals(expectedBalance, accountEntity.getBalance()); // Verify balance after the operation
-        verify(accountRepository, times(expectedResult ? 1 : 0)).save(any(AccountEntity.class)); // Check if save was called based on the expected result
+        verify(accountRepositoryAdapter, times(expectedResult ? 1 : 0)).saveAccount(any(AccountEntity.class)); // Check if save was called based on the expected result
     }
 }

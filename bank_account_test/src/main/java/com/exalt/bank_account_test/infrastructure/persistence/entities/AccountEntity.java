@@ -44,6 +44,14 @@ public class AccountEntity {
         return account;
     }
 
+    public static AccountEntity fromDomain(Account account) {
+        AccountEntity entity = new AccountEntity();
+        entity.setId(account.getId());
+        entity.setBalance(account.getBalance());
+        entity.setTransactions(account.getTransactions());
+        return entity;
+    }
+
     public UUID getId() {
         return id;
     }
