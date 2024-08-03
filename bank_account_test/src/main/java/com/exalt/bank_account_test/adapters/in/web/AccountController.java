@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.exalt.bank_account_test.domain.model.Account;
 import com.exalt.bank_account_test.domain.model.Transaction;
 import com.exalt.bank_account_test.domain.service.AccountService;
-import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -31,7 +30,7 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createAccount(@RequestBody AccountEntity account) {
+    public ResponseEntity<String> createAccount(@RequestBody Account account) {
         try {
             UUID id = accountService.createAccount(account);
             String message = String.format("Account well created : %s", id);
@@ -42,9 +41,9 @@ public class AccountController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AccountEntity>> getAccounts() {
+    public ResponseEntity<List<Account>> getAccounts() {
         try {
-            List<AccountEntity> accounts = accountService.getAccounts();
+            List<Account> accounts = accountService.getAccounts();
             return new ResponseEntity<>(accounts, HttpStatus.OK);
         } catch(Exception exception) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,11 +65,11 @@ public class AccountController {
     @GetMapping("/{id}/transactions")
     public ResponseEntity<List<Transaction>> getTransactions(@PathVariable UUID id) {
         try {
+            //System.out.println(id);
             List<Transaction> transactions = accountService.consultTransactionHistory(id);
 
             return new ResponseEntity<>(transactions, HttpStatus.OK);
         } catch(Exception exception) {
-            System.out.println(exception.getMessage());
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

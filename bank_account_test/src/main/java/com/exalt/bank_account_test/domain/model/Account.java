@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
-
 public class Account {
     private UUID id;
     // to simplify, we consider that we use only one currency here (euros for example)
@@ -77,10 +75,6 @@ public class Account {
         this.balance = balance;
     }
 
-    /**
-     * getter to retrieve the transaction history
-     * @return the list of transactions
-     */
     public List<Transaction> getTransactions() {
         return transactions;
     }
@@ -89,27 +83,8 @@ public class Account {
         this.transactions = transactions;
     }
 
-    /**
-     * method to display the transaction history
-     */
-    public void consultTransactionHistory() {
-        System.out.println("Historique des transactions :");
-        for(Transaction transaction : transactions) {
-            System.out.println(transaction.toString());
-        }
-    }
-
-    // convert entity to domain model
-    public AccountEntity toEntity() {
-        AccountEntity account = new AccountEntity();
-        account.setId(this.id);
-        account.setBalance(this.balance);
-        account.setTransactions(transactions);
-        return account;
-    }
-
     @Override
     public String toString() {
-        return "Account [balance=" + balance + ", transactions=" + transactions + "]";
+        return "Account [id=" + id + ", balance=" + balance + ", transactions=" + transactions + "]";
     }
 }

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.exalt.bank_account_test.adapters.out.persistence.AccountRepositoryAdapter;
+import com.exalt.bank_account_test.adapters.out.persistence.TransactionRepositoryAdapter;
 import com.exalt.bank_account_test.domain.model.Account;
 import com.exalt.bank_account_test.domain.model.Transaction;
 import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEntity;
@@ -13,19 +14,21 @@ import com.exalt.bank_account_test.infrastructure.persistence.entities.AccountEn
 @Service
 public class DomainAccountService implements AccountService {
     private final AccountRepositoryAdapter accountRepositoryAdapter;
+    private final TransactionRepositoryAdapter transactionRepositoryAdapter;
 
-    public DomainAccountService( AccountRepositoryAdapter accountRepositoryAdapter) {
+    public DomainAccountService(AccountRepositoryAdapter accountRepositoryAdapter, TransactionRepositoryAdapter transactionRepositoryAdapter) {
         this.accountRepositoryAdapter = accountRepositoryAdapter;
+        this.transactionRepositoryAdapter = transactionRepositoryAdapter;
     }
 
     @Override
-    public UUID createAccount(AccountEntity accountEntity) {
-        AccountEntity generatedEntity = accountRepositoryAdapter.saveAccount(accountEntity);
+    public UUID createAccount(Account account) {
+        AccountEntity generatedEntity = accountRepositoryAdapter.saveAccount(account);
         return generatedEntity.getId();
     }
 
     @Override
-    public List<AccountEntity> getAccounts() {
+    public List<Account> getAccounts() {
         return accountRepositoryAdapter.findAll();
     }
 
@@ -38,32 +41,41 @@ public class DomainAccountService implements AccountService {
     }
 
     @Override
-    public List<Transaction> consultTransactionHistory(UUID id) {
-        Account account = getAccount(id);
+    public List<Transaction> consultTransactionHistory(UUID id) {    
+        //System.out.println("accountId : " + id);
+        return transactionRepositoryAdapter.findAll();
+        //return transactionRepositoryAdapter.findByAccountId(id);
+    }
 
-        return account.getTransactions();
+    @Override
+    public List<Transaction> consultAllTransactions() {
+        return transactionRepositoryAdapter.findAll();
     }
 
     @Override
     public boolean depositMoney(UUID id, Transaction transaction) {
         Account account = getAccount(id);
-        boolean result = account.depositMoney(transaction);
+        boolean success = account.depositMoney(transaction);
 
-        if(result == true) {
-            accountRepositoryAdapter.saveAccount(account.toEntity());
+        if(success) {
+            AccountEntity accountEntity = accountRepositoryAdapter.findById(id).get();
+            //transactionRepositoryAdapter.save(transaction, accountEntity);
+            accountRepositoryAdapter.saveAccount(account);
         }
-        return result;
+        return success;
     }
 
     @Override
     public boolean withdrawMoney(UUID id, Transaction transaction) {
         Account account = getAccount(id);
-        boolean result = account.withdrawMoney(transaction);
+        boolean success = account.withdrawMoney(transaction);
 
-        if(result == true) {
-            accountRepositoryAdapter.saveAccount(account.toEntity());
+        if(success) {
+            AccountEntity accountEntity = accountRepositoryAdapter.findById(id).get();
+            //transactionRepositoryAdapter.save(transaction, accountEntity);
+            accountRepositoryAdapter.saveAccount(account);
         }
-        return result;
+        return success;
     }
 
     /**
