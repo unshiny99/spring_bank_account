@@ -52,14 +52,6 @@ public class Transaction {
         this.dateTime = dateTime;
     }
 
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
-
     @Override
     public String toString() {
         return "Transaction [id=" + id + ", amount=" + amount + ", dateTime=" + dateTime + ", account=" + account + "]";

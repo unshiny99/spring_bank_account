@@ -65,7 +65,6 @@ public class AccountController {
     @GetMapping("/{id}/transactions")
     public ResponseEntity<List<Transaction>> getTransactions(@PathVariable UUID id) {
         try {
-            //System.out.println(id);
             List<Transaction> transactions = accountService.consultTransactionHistory(id);
 
             return new ResponseEntity<>(transactions, HttpStatus.OK);

@@ -42,9 +42,8 @@ public class DomainAccountService implements AccountService {
 
     @Override
     public List<Transaction> consultTransactionHistory(UUID id) {    
-        //System.out.println("accountId : " + id);
-        return transactionRepositoryAdapter.findAll();
-        //return transactionRepositoryAdapter.findByAccountId(id);
+        Account account = getAccount(id);
+        return account.getTransactions();
     }
 
     @Override
@@ -58,8 +57,6 @@ public class DomainAccountService implements AccountService {
         boolean success = account.depositMoney(transaction);
 
         if(success) {
-            AccountEntity accountEntity = accountRepositoryAdapter.findById(id).get();
-            //transactionRepositoryAdapter.save(transaction, accountEntity);
             accountRepositoryAdapter.saveAccount(account);
         }
         return success;
@@ -71,8 +68,6 @@ public class DomainAccountService implements AccountService {
         boolean success = account.withdrawMoney(transaction);
 
         if(success) {
-            AccountEntity accountEntity = accountRepositoryAdapter.findById(id).get();
-            //transactionRepositoryAdapter.save(transaction, accountEntity);
             accountRepositoryAdapter.saveAccount(account);
         }
         return success;

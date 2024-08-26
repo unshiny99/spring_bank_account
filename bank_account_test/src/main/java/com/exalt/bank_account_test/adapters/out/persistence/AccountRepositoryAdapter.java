@@ -41,6 +41,7 @@ public class AccountRepositoryAdapter implements AccountRepository {
     // convert domain model to entity
     public AccountEntity toEntity(Account account) {
         AccountEntity accountEntity = new AccountEntity();
+        accountEntity.setId(account.getId());
         accountEntity.setBalance(account.getBalance());
         accountEntity.setTransactions(account.getTransactions().stream().map(t -> new TransactionEntity(t, accountEntity)).collect(Collectors.toList()));
 

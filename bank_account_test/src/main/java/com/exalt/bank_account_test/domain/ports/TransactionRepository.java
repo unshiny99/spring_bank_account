@@ -16,5 +16,5 @@ public interface TransactionRepository {
     Optional<Transaction> findById(UUID id);
 
     List<Transaction> findAll();
-    List<Transaction> findByAccountId(UUID accountId);
+    //List<Transaction> findByAccountId(UUID accountId);
 }

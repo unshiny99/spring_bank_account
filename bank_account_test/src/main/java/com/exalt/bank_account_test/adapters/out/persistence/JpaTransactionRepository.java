@@ -10,5 +10,5 @@ import com.exalt.bank_account_test.infrastructure.persistence.entities.Transacti
 
 @Repository
 public interface JpaTransactionRepository extends JpaRepository<TransactionEntity, UUID> {
-    List<TransactionEntity> findByAccountId(UUID accountId);
+    //List<TransactionEntity> findByAccountId(UUID accountId);
 }

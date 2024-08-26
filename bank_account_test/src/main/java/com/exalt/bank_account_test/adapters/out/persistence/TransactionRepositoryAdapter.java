@@ -29,13 +29,14 @@ public class TransactionRepositoryAdapter implements TransactionRepository {
             .collect(Collectors.toList());
     }
 
+    /* 
     @Override
     public List<Transaction> findByAccountId(UUID accountId) {
         return jpaTransactionRepository.findByAccountId(accountId)
             .stream()
             .map(TransactionEntity::toDomain)
             .collect(Collectors.toList());
-    }
+    }*/
 
     @Override
     public TransactionEntity save(Transaction transaction, AccountEntity accountEntity) {

@@ -6,7 +6,6 @@ import java.util.UUID;
 import com.exalt.bank_account_test.domain.model.Transaction;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,7 +21,7 @@ public class TransactionEntity {
     private double amount;
     private LocalDateTime dateTime;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "account_id", nullable = false)
     private AccountEntity account;
 
@@ -66,6 +65,14 @@ public class TransactionEntity {
 
     public void setDateTime(LocalDateTime dateTime) {
         this.dateTime = dateTime;
+    }
+
+    public AccountEntity getAccount() {
+        return account;
+    }
+
+    public void setAccount(AccountEntity account) {
+        this.account = account;
     }
 
     @Override
