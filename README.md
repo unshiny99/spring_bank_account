@@ -1,4 +1,4 @@
-# Bank Account Test pour Exalt
+# Bank Account Test
 
 ## Installation
 
