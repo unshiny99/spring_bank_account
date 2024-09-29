@@ -54,27 +54,31 @@ public class DomainAccountServiceUnitTest {
 
     @Test
     void shouldConsultBalance() {
-        UUID accountId = UUID.randomUUID();
         Account account = new Account();
-        account.setId(accountId);
         account.setBalance(100.0);
 
-        //when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(account));
+        UUID accountId = UUID.randomUUID();
+        AccountEntity savedEntity = new AccountEntity(account);
+        savedEntity.setId(accountId);
 
-        accountServiceUnitTest.consultBalance(accountId);
+        // Mock the findById method to return the savedEntity when the accountId is passed
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(savedEntity));
+
+        double balance = accountServiceUnitTest.consultBalance(accountId);
 
         verify(accountRepositoryAdapter, times(1)).findById(accountId);
-        double balance = accountServiceUnitTest.consultBalance(accountId);
+
         assertEquals(100.0, balance);
     }
 
     @Test
     void shouldConsultTransactionHistory() {
-        UUID accountId = UUID.randomUUID();
         Account account = new Account();
-        account.setId(accountId);
+        AccountEntity savedEntity = new AccountEntity(account);
+        UUID accountId = UUID.randomUUID();
+        savedEntity.setId(accountId);
 
-        //when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(account));
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(savedEntity));
 
         accountServiceUnitTest.consultTransactionHistory(accountId);
 
@@ -97,22 +101,22 @@ public class DomainAccountServiceUnitTest {
         Account account = new Account();
         account.setId(accountId);
         account.setBalance(initialBalance);
+
+        AccountEntity savedEntity = new AccountEntity(account);
+        savedEntity.setId(accountId);
     
         Transaction depositTransaction = new Transaction(depositAmount);
     
-        //when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(account));
-        when(accountRepositoryAdapter.saveAccount(any(Account.class))).thenAnswer(invocation -> {
-            Account updatedAccount = invocation.getArgument(0);
-            account.setBalance(updatedAccount.getBalance());
-            return updatedAccount;
-        });
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(savedEntity));
     
         // Act
         boolean result = accountServiceUnitTest.depositMoney(accountId, depositTransaction);
+        // Retrieve the updated account entity
+        AccountEntity updatedEntity = accountRepositoryAdapter.findById(accountId).get();
     
         // Assert
         assertEquals(expectedResult, result); // Check if the operation result matches the expected result
-        assertEquals(expectedBalance, account.getBalance()); // Verify balance after the operation
+        assertEquals(expectedBalance, updatedEntity.getBalance()); // Verify balance after the operation
         verify(accountRepositoryAdapter, times(expectedResult ? 1 : 0)).saveAccount(any(Account.class)); // Check if save was called based on the expected result
     }
 
@@ -131,21 +135,28 @@ public class DomainAccountServiceUnitTest {
         Account account = new Account();
         account.setId(accountId);
         account.setBalance(initialBalance);
+
+        AccountEntity savedEntity = new AccountEntity(account);
+        savedEntity.setId(accountId);
     
         Transaction withdrawTransaction = new Transaction(withdrawAmount);
     
-        //when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(account));
+        when(accountRepositoryAdapter.findById(accountId)).thenReturn(Optional.of(savedEntity));
+        /*
         when(accountRepositoryAdapter.saveAccount(any(Account.class))).thenAnswer(invocation -> {
             Account updatedEntity = invocation.getArgument(0);
             account.setBalance(updatedEntity.getBalance());
             return updatedEntity;
         });
+         */
 
         // Act
         boolean result = accountServiceUnitTest.withdrawMoney(accountId, withdrawTransaction);
+        // Retrieve the updated account entity
+        AccountEntity updatedEntity = accountRepositoryAdapter.findById(accountId).get();
     
         assertEquals(expectedResult, result); // Check if the operation result matches the expected result
-        assertEquals(expectedBalance, account.getBalance()); // Verify balance after the operation
+        assertEquals(expectedBalance, updatedEntity.getBalance()); // Verify balance after the operation
         verify(accountRepositoryAdapter, times(expectedResult ? 1 : 0)).saveAccount(any(Account.class)); // Check if save was called based on the expected result
     }
 }
